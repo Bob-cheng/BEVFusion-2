@@ -3,6 +3,8 @@ _base_ = [
     # '../_base_/schedules/schedule_1x.py',
 
 ]
+seed=17
+deterministic=True
 point_cloud_range = [-54.0, -54.0, -5.0, 54.0, 54.0, 3.0]
 class_names = [
     'car', 'truck', 'construction_vehicle', 'bus', 'trailer', 'barrier',
@@ -94,7 +96,7 @@ model = dict(
         upsample_cfg=dict(type='deconv', bias=False),
         use_conv_for_no_stride=True),
     pts_bbox_head=dict(
-        type='TransFusionHead',
+        type='TransFusionHead_v4',
         fuse_img=False,
         num_views=num_views,
         in_channels_img=256,

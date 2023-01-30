@@ -137,7 +137,7 @@ def parse_requirements(fname='requirements.txt', with_version=True):
 
 if __name__ == '__main__':
     setup(
-        name='mmdet3d',
+        name='mmdet3d_BEV',
         version=get_version(),
         description=("OpenMMLab's next-generation platform"
                      'for general 3D object detection.'),

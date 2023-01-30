@@ -1,6 +1,8 @@
 import argparse
 import mmcv
 import os
+import sys
+sys.path.append('.')
 import torch
 import warnings
 from mmcv import Config, DictAction
@@ -164,7 +166,7 @@ def main():
         shuffle=False)
 
     # build the model and load checkpoint
-    cfg.model.train_cfg = None
+    # cfg.model.train_cfg = None
     model = build_detector(cfg.model, test_cfg=cfg.get('test_cfg'))
     fp16_cfg = cfg.get('fp16', None)
     if fp16_cfg is not None:
@@ -181,7 +183,8 @@ def main():
 
     if not distributed:
         model = MMDataParallel(model, device_ids=[0])
-        outputs = single_gpu_test(model, data_loader, args.show, args.show_dir)
+        # outputs = single_gpu_test(model, data_loader, args.show, args.show_dir)
+        outputs = single_gpu_test(model, data_loader)
     else:
         model = MMDistributedDataParallel(
             model.cuda(),

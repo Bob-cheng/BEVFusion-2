@@ -5,8 +5,8 @@ class_names = [
 ]
 evaluation = dict(interval=36)
 
-dataset_type = 'NuScenesDataset'
-data_root = 'data/nuscenes/'
+dataset_type = 'NuScenesDataset_v4'
+data_root = 'data/nuscenes/mini'
 input_modality = dict(
     use_lidar=True,
     use_camera=True,
@@ -48,31 +48,32 @@ train_pipeline = [
 ]
 test_pipeline = [
     dict(
-        type='LoadPointsFromFile',
+        type='LoadPointsFromFile_v4',
         coord_type='LIDAR',
         load_dim=5,
         use_dim=[0, 1, 2, 3, 4],
     ),
     dict(
-        type='LoadPointsFromMultiSweeps',
+        type='LoadPointsFromMultiSweeps_v4',
         sweeps_num=10,
         use_dim=[0, 1, 2, 3, 4],
     ),
-    dict(type='LoadMultiViewImageFromFiles'),
+    dict(type='LoadAnnotations3D_v4', with_bbox_3d=True, with_label_3d=True),
+    dict(type='LoadMultiViewImageFromFiles_v4'),
     dict(
         type='MultiScaleFlipAug3D',
         img_scale=img_scale,
         pts_scale_ratio=1,
         flip=False,
         transforms=[
-            dict(type='MyResize', img_scale=img_scale, keep_ratio=True),
-            dict(type='MyNormalize', **img_norm_cfg),
+            dict(type='MyResize_v4', img_scale=img_scale, keep_ratio=True),
+            dict(type='MyNormalize_v4', **img_norm_cfg),
             dict(type='MyPad', size_divisor=32),
             dict(
-                type='DefaultFormatBundle3D',
+                type='DefaultFormatBundle3D_v2',
                 class_names=class_names,
                 with_label=False),
-            dict(type='Collect3D', keys=['points', 'img'])
+            dict(type='Collect3D_v2', keys=['points', 'img', 'gt_bboxes_3d', 'gt_labels_3d'])
         ])
 ]
 data = dict(
