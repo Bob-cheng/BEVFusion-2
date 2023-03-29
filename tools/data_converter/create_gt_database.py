@@ -170,21 +170,22 @@ def create_groundtruth_database(dataset_class_name,
 
     elif dataset_class_name == 'NuScenesDataset':
         dataset_cfg.update(
+            type='NuScenesDataset_v4',
             use_valid_flag=True,
             pipeline=[
                 dict(
-                    type='LoadPointsFromFile',
+                    type='LoadPointsFromFile_v4',
                     coord_type='LIDAR',
                     load_dim=5,
                     use_dim=5),
                 dict(
-                    type='LoadPointsFromMultiSweeps',
+                    type='LoadPointsFromMultiSweeps_v4',
                     sweeps_num=10,
                     use_dim=[0, 1, 2, 3, 4],
                     pad_empty_sweeps=True,
                     remove_close=True),
                 dict(
-                    type='LoadAnnotations3D',
+                    type='LoadAnnotations3D_v4',
                     with_bbox_3d=True,
                     with_label_3d=True)
             ])

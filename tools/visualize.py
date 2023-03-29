@@ -101,7 +101,7 @@ def main() -> None:
 
         if args.mode == "pred":
             with torch.inference_mode():
-                outputs = model(**data)
+                outputs = model(return_loss=False, rescale=True, **data)
 
         if args.mode == "gt" and "gt_bboxes_3d" in data:
             bboxes = data["gt_bboxes_3d"][0].data[0][0].tensor.numpy()
@@ -114,10 +114,11 @@ def main() -> None:
 
             # bboxes[..., 2] -= bboxes[..., 5] / 2
             bboxes = LiDARInstance3DBoxes(bboxes, box_dim=9)
-        elif args.mode == "pred" and "boxes_3d" in outputs[0]:
-            bboxes = outputs[0]["boxes_3d"].tensor.numpy()
-            scores = outputs[0]["scores_3d"].numpy()
-            labels = outputs[0]["labels_3d"].numpy()
+            scores = torch.ones_like(indices)
+        elif args.mode == "pred" and "boxes_3d" in outputs[0]['pts_bbox']:
+            bboxes = outputs[0]['pts_bbox']["boxes_3d"].tensor.numpy()
+            scores = outputs[0]['pts_bbox']["scores_3d"].numpy()
+            labels = outputs[0]['pts_bbox']["labels_3d"].numpy()
 
             if args.bbox_classes is not None:
                 indices = np.isin(labels, args.bbox_classes)
@@ -158,7 +159,8 @@ def main() -> None:
                     labels=labels,
                     transform=metas["lidar2img"][k],
                     classes=cfg.class_names,
-                    box_idxs=box_idxs
+                    box_idxs=box_idxs,
+                    scores=scores
                 )
 
         if "points" in data:
@@ -186,4 +188,9 @@ if __name__ == "__main__":
 
 """
 CUDA_VISIBLE_DEVICES=6 torchpack dist-run -np 1 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug.py --mode gt --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/mini/visulize/ --bbox-score 0.3 --split val
+
+CUDA_VISIBLE_DEVICES=2 torchpack dist-run -np 1 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla.py --mode gt --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla/visulize/ --bbox-score 0.1 --split val
+
+CUDA_VISIBLE_DEVICES=2 torchpack dist-run -np 1 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla.py --mode pred --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla/visulize/ --bbox-score 0.01 --split val
+
 """
