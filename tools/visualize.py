@@ -67,6 +67,7 @@ def main() -> None:
         samples_per_gpu=1,
         workers_per_gpu=cfg.data.workers_per_gpu,
         dist=True,
+        # dist=False,
         shuffle=False,
     )
 
@@ -85,6 +86,7 @@ def main() -> None:
         else:
             model.CLASSES = dataset.CLASSES
         distributed = True
+        # distributed = False
         if not distributed:
             model = MMDataParallel(model, device_ids=[0])
         else:
@@ -114,7 +116,7 @@ def main() -> None:
 
             # bboxes[..., 2] -= bboxes[..., 5] / 2
             bboxes = LiDARInstance3DBoxes(bboxes, box_dim=9)
-            scores = torch.ones_like(indices)
+            scores = np.ones_like(labels)
         elif args.mode == "pred" and "boxes_3d" in outputs[0]['pts_bbox']:
             bboxes = outputs[0]['pts_bbox']["boxes_3d"].tensor.numpy()
             scores = outputs[0]['pts_bbox']["scores_3d"].numpy()
@@ -191,6 +193,13 @@ CUDA_VISIBLE_DEVICES=6 torchpack dist-run -np 1 python ./tools/visualize.py ./co
 
 CUDA_VISIBLE_DEVICES=2 torchpack dist-run -np 1 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla.py --mode gt --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla/visulize/ --bbox-score 0.1 --split val
 
-CUDA_VISIBLE_DEVICES=2 torchpack dist-run -np 1 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla.py --mode pred --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla/visulize/ --bbox-score 0.01 --split val
+CUDA_VISIBLE_DEVICES=4,5,6 torchpack dist-run -np 3 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla.py --mode pred --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla/visulize/pred --bbox-score 0.01 --split val
+
+# generate GT files in bevfusion folder:
+python tools/create_data.py nuscenes --root-path /data3/share/nuscene/carla --out-dir /data3/share/nuscene/carla --extra-tag nuscenes
+
+CUDA_VISIBLE_DEVICES=2 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla.py --mode gt --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla/visulize/ --bbox-score 0.1 --split val
+
+CUDA_VISIBLE_DEVICES=2 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla.py --mode pred --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla/visulize/pred --bbox-score 0.1 --split val
 
 """
