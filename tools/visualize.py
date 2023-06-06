@@ -191,12 +191,13 @@ if __name__ == "__main__":
 """
 CUDA_VISIBLE_DEVICES=6 torchpack dist-run -np 1 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug.py --mode gt --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/mini/visulize/ --bbox-score 0.3 --split val
 
-CUDA_VISIBLE_DEVICES=2 torchpack dist-run -np 1 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla.py --mode gt --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla/visulize/ --bbox-score 0.1 --split val
+CUDA_VISIBLE_DEVICES=1,2,3 torchpack dist-run -np 3 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla.py --mode gt --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla/visulize/ --bbox-score 0.1 --split val
 
-CUDA_VISIBLE_DEVICES=4,5,6 torchpack dist-run -np 3 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla.py --mode pred --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla/visulize/pred --bbox-score 0.01 --split val
+CUDA_VISIBLE_DEVICES=1,2,3 torchpack dist-run -np 3 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla.py --mode pred --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla/visulize/pred --bbox-score 0.1 --split val
 
 # generate GT files in bevfusion folder:
-python tools/create_data.py nuscenes --root-path /data3/share/nuscene/carla --out-dir /data3/share/nuscene/carla --extra-tag nuscenes
+# copy v1.14/ to v1.0-mini/ first and then copy maps/
+python tools/create_data.py nuscenes --root-path /data3/share/nuscene/carla --out-dir /data3/share/nuscene/carla --extra-tag nuscenes --version v1.0-mini
 
 CUDA_VISIBLE_DEVICES=2 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla.py --mode gt --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla/visulize/ --bbox-score 0.1 --split val
 
