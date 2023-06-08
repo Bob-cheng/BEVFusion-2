@@ -193,7 +193,7 @@ CUDA_VISIBLE_DEVICES=6 torchpack dist-run -np 1 python ./tools/visualize.py ./co
 
 CUDA_VISIBLE_DEVICES=1,2,3 torchpack dist-run -np 3 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla.py --mode gt --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla/visulize/ --bbox-score 0.1 --split val
 
-CUDA_VISIBLE_DEVICES=1,2,3 torchpack dist-run -np 3 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla.py --mode pred --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla/visulize/pred --bbox-score 0.1 --split val
+CUDA_VISIBLE_DEVICES=2,3,4,5 torchpack dist-run -np 4 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla.py --mode pred --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla/visulize/pred --bbox-score 0.1 --split val
 
 # generate GT files in bevfusion folder:
 # copy v1.14/ to v1.0-mini/ first and then copy maps/
