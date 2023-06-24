@@ -99,7 +99,8 @@ def main() -> None:
 
     for data in tqdm(dataflow):
         metas = data["img_metas"][0].data[0][0]
-        name = "{}-{}".format(int(metas["timestamp"]*1e6), metas["sample_idx"])
+        # name = "{}-{}".format(int(metas["timestamp"]*1e6), metas["sample_idx"])
+        name = "{}-{}".format(metas['pts_filename'][-24:-8], metas["sample_idx"])
 
         if args.mode == "pred":
             with torch.inference_mode():
@@ -161,8 +162,8 @@ def main() -> None:
                     labels=labels,
                     transform=metas["lidar2img"][k],
                     classes=cfg.class_names,
-                    box_idxs=box_idxs,
-                    scores=scores
+                    box_idxs=None, #box_idxs,
+                    scores=None, #scores
                 )
 
         if "points" in data:
@@ -193,7 +194,7 @@ CUDA_VISIBLE_DEVICES=6 torchpack dist-run -np 1 python ./tools/visualize.py ./co
 
 CUDA_VISIBLE_DEVICES=1,2,3 torchpack dist-run -np 3 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla.py --mode gt --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla/visulize/ --bbox-score 0.1 --split val
 
-CUDA_VISIBLE_DEVICES=2,3,4,5 torchpack dist-run -np 4 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla.py --mode pred --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla/visulize/pred --bbox-score 0.1 --split val
+CUDA_VISIBLE_DEVICES=2,6 torchpack dist-run -np 2 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla.py --mode pred --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla/visulize/pred03 --bbox-score 0.3 --split val
 
 # generate GT files in bevfusion folder:
 # copy v1.14/ to v1.0-mini/ first and then copy maps/
@@ -202,5 +203,14 @@ python tools/create_data.py nuscenes --root-path /data3/share/nuscene/carla --ou
 CUDA_VISIBLE_DEVICES=2 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla.py --mode gt --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla/visulize/ --bbox-score 0.1 --split val
 
 CUDA_VISIBLE_DEVICES=2 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla.py --mode pred --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla/visulize/pred --bbox-score 0.1 --split val
+
+# generate GT files in bevfusion folder (for carla_adv):
+python tools/create_data.py nuscenes --root-path /data3/share/nuscene/carla_adv --out-dir /data3/share/nuscene/carla_adv --extra-tag nuscenes --version v1.0-mini
+
+CUDA_VISIBLE_DEVICES=2,6 torchpack dist-run -np 2 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla_adv.py --mode pred --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla_adv/visulize/pred085 --bbox-score 0.85 --split val
+
+ffmpeg -framerate 10 -pattern_type glob -i './*.png' -c:v libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -pix_fmt yuv420p simu_adv_lidar_04.mp4
+
+
 
 """
