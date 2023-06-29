@@ -209,7 +209,7 @@ python tools/create_data.py nuscenes --root-path /data3/share/nuscene/carla_adv 
 
 CUDA_VISIBLE_DEVICES=2,6 torchpack dist-run -np 2 python ./tools/visualize.py ./configs/bevfusion/bevf_tf_4x8_10e_nusc_aug_carla_adv.py --mode pred --checkpoint ./pretrained/bevfusion_tf.pth --out-dir ./data/nuscenes/carla_adv/visulize/pred085 --bbox-score 0.85 --split val
 
-ffmpeg -framerate 10 -pattern_type glob -i './*.png' -c:v libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -pix_fmt yuv420p simu_adv_lidar_04.mp4
+ffmpeg -framerate 10 -pattern_type glob -i './*.png' -c:v libx264 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -pix_fmt yuv420p nuscenes_adv_obj_03.mp4
 
 
 
